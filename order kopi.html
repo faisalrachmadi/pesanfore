@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Pemesanan Fore Coffee</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    :root {
+      --green: #27ae60;
+      --green-dark: #1e8449;
+      --bg: #f5f5f5;
+    }
+    body {
+      font-family: Arial, sans-serif;
+      background: var(--bg);
+      margin: 0;
+      padding: 10px;
+    }
+    h2 {
+      text-align: center;
+      margin: 15px 0;
+    }
+    .form-section {
+      background: #fff;
+      padding: 15px;
+      border-radius: 10px;
+      margin-bottom: 15px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+    .form-section h3 {
+      margin-top: 0;
+      margin-bottom: 10px;
+      font-size: 16px;
+      border-bottom: 1px solid #eee;
+      padding-bottom: 5px;
+    }
+    label {
+      font-size: 14px;
+      font-weight: bold;
+      margin-bottom: 5px;
+      display: block;
+    }
+    input, select {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 12px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      font-size: 14px;
+    }
+    .menu-container {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+    }
+    .card {
+      background: #fff;
+      border-radius: 8px;
+      padding: 12px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .card h3 {
+      font-size: 14px;
+      margin: 0 0 5px 0;
+    }
+    .price {
+      font-weight: bold;
+      color: var(--green);
+      margin-bottom: 8px;
+      font-size: 14px;
+    }
+    .controls {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .controls button {
+      width: 28px;
+      height: 28px;
+      border: none;
+      border-radius: 50%;
+      background: var(--green);
+      color: #fff;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    .controls span {
+      font-size: 14px;
+      font-weight: bold;
+      min-width: 20px;
+      text-align: center;
+    }
+    .cart-preview {
+      background: #fff;
+      padding: 15px;
+      border-radius: 10px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      margin-top: 15px;
+    }
+    .cart-preview h3 {
+      margin: 0 0 10px 0;
+      font-size: 16px;
+      border-bottom: 1px solid #eee;
+      padding-bottom: 5px;
+    }
+    .cart-preview ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    .cart-preview li {
+      display: flex;
+      justify-content: space-between;
+      font-size: 14px;
+      margin-bottom: 5px;
+    }
+    .summary {
+      margin-top: 15px;
+      padding: 15px;
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      text-align: center;
+      font-size: 16px;
+    }
+    .summary button {
+      margin-top: 12px;
+      width: 100%;
+      padding: 12px;
+      font-size: 15px;
+      font-weight: bold;
+      border: none;
+      border-radius: 8px;
+      background: var(--green);
+      color: #fff;
+      cursor: pointer;
+    }
+    .summary button:hover {
+      background: var(--green-dark);
+    }
+    /* Tablet */
+    @media (min-width: 600px) {
+      .menu-container {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+    /* Desktop */
+    @media (min-width: 900px) {
+      .menu-container {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+  </style>
+</head>
+<body>
+  <h2>Pemesanan Fore Coffee</h2>
+  
+  <form id="orderForm" action="https://n8n-pjwnptzbnrh6.caca.sumopod.my.id/webhook/2cb171cb-1b22-4d3b-9ce8-d8a1e4fc5f00" method="POST">
+    
+    <!-- Data Customer -->
+    <div class="form-section">
+      <h3>Data Customer</h3>
+      <label for="nama">Nama</label>
+      <input type="text" id="nama" name="nama" placeholder="Nama lengkap" required>
+
+      <label for="wa">No. WhatsApp</label>
+      <input type="text" id="wa" name="wa" placeholder="Contoh: 08123456789" required>
+
+      <label for="pengambilan">Metode Pengambilan</label>
+      <select id="pengambilan" name="pengambilan" required>
+        <option value="">-- Pilih Metode --</option>
+        <option value="Delivery">Delivery</option>
+        <option value="Ambil di Outlet">Ambil di Outlet</option>
+      </select>
+    </div>
+
+    <!-- Daftar Menu -->
+    <div class="form-section">
+      <h3>Pilih Menu</h3>
+      <div class="menu-container" id="menuContainer">
+        <!-- Card menu dari JS -->
+      </div>
+    </div>
+
+    <!-- Preview Keranjang -->
+    <div class="cart-preview">
+      <h3>Keranjang Belanja</h3>
+      <ul id="cartList">
+        <li style="color:#aaa;">Belum ada item dipilih</li>
+      </ul>
+    </div>
+
+    <!-- Ringkasan -->
+    <div class="summary">
+      <div>Total Belanja: Rp <span id="totalPrice">0</span></div>
+      <button type="submit">Pesan Sekarang</button>
+    </div>
+  </form>
+
+  <script>
+    const menu = [
+      {name: "Dirty Matchapresso", price: 23250},
+      {name: "Matcha Earl Jasmine", price: 23250},
+      {name: "Matcha Butter Salt Cream", price: 23250},
+      {name: "Choco Cookie Shake", price: 21750},
+      {name: "Butterscotch Milk Crumble", price: 21750},
+      {name: "Vanilla O’ Crumbs", price: 21750},
+      {name: "Choco Caramel Cloud", price: 21750},
+      {name: "Kopi Dari Tani", price: 18000},
+      {name: "Butterscotch Sea Salt Latte", price: 21750},
+      {name: "Butterscotch Latte", price: 23250},
+      {name: "Aren Latte", price: 21750},
+      {name: "Pandan Latte", price: 20250},
+      {name: "Malty Latte", price: 20250},
+      {name: "Bumi Latte", price: 18000},
+      {name: "Cappuccino", price: 21750},
+      {name: "Double Iced Shaken Latte", price: 24750},
+      {name: "Café Latte", price: 21750},
+      {name: "Nutty Oat Latte", price: 29250},
+      {name: "Buttercream Tiramisu Latte", price: 24750},
+      {name: "Espresso", price: 14250},
+      {name: "Caramel Praline Macchiato", price: 24750},
+      {name: "Americano", price: 16500},
+      {name: "Manuka Americano", price: 21750},
+      {name: "Triple Peach Americano", price: 21750},
+      {name: "Berry Manuka Americano", price: 23250},
+      {name: "Dark Chocolate", price: 25500},
+      {name: "Almond Choco", price: 29250},
+      {name: "Matcha Green Tea", price: 25500},
+      {name: "Classic Milo", price: 18750},
+      {name: "Coco Peach Fusion 1L", price: 67500},
+      {name: "Kopi Dari Tani 1L", price: 63000},
+      {name: "Bumi Latte 1L", price: 63000},
+      {name: "Dark Chocolate 1L", price: 71250},
+    ];
+
+    const menuContainer = document.getElementById("menuContainer");
+    const totalPriceEl = document.getElementById("totalPrice");
+    const cartList = document.getElementById("cartList");
+
+    let cart = {};
+
+    menu.forEach((item, index) => {
+      cart[item.name] = 0;
+      const card = document.createElement("div");
+      card.className = "card";
+      card.innerHTML = `
+        <h3>${item.name}</h3>
+        <div class="price">Rp ${item.price.toLocaleString()}</div>
+        <div class="controls">
+          <button type="button" onclick="updateQuantity('${item.name}', -1, ${index})">-</button>
+          <span id="qty-${index}">0</span>
+          <button type="button" onclick="updateQuantity('${item.name}', 1, ${index})">+</button>
+        </div>
+      `;
+      menuContainer.appendChild(card);
+    });
+
+    function updateQuantity(name, change, index) {
+      cart[name] = Math.max(0, cart[name] + change);
+      document.getElementById(`qty-${index}`).innerText = cart[name];
+      updateTotal();
+      updateCartPreview();
+    }
+
+    function updateTotal() {
+      let total = 0;
+      for (const item of menu) {
+        total += cart[item.name] * item.price;
+      }
+      totalPriceEl.innerText = total.toLocaleString();
+    }
+
+    function updateCartPreview() {
+      cartList.innerHTML = "";
+      let hasItem = false;
+      for (const item of menu) {
+        if (cart[item.name] > 0) {
+          hasItem = true;
+          const li = document.createElement("li");
+          li.innerHTML = `<span>${item.name} x${cart[item.name]}</span> <span>Rp ${(cart[item.name]*item.price).toLocaleString()}</span>`;
+          cartList.appendChild(li);
+        }
+      }
+      if (!hasItem) {
+        cartList.innerHTML = `<li style="color:#aaa;">Belum ada item dipilih</li>`;
+      }
+    }
+
+    document.getElementById("orderForm").addEventListener("submit", function(e) {
+      const orderDetails = [];
+      for (const item of menu) {
+        if (cart[item.name] > 0) {
+          orderDetails.push(`${item.name} x${cart[item.name]} = Rp ${(cart[item.name] * item.price).toLocaleString()}`);
+        }
+      }
+      const hiddenInput = document.createElement("input");
+      hiddenInput.type = "hidden";
+      hiddenInput.name = "order";
+      hiddenInput.value = orderDetails.join("\n");
+      this.appendChild(hiddenInput);
+
+      const totalInput = document.createElement("input");
+      totalInput.type = "hidden";
+      totalInput.name = "total";
+      totalInput.value = totalPriceEl.innerText;
+      this.appendChild(totalInput);
+    });
+  </script>
+</body>
+</html>
